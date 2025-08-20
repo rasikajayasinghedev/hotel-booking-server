@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-import dbConnect from "./lib/db";
+import dbConnect from "./lib/db.js";
 
 dotenv.config();
 
