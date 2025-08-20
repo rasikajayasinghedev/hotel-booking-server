@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
+import dbConnect from "./lib/db";
 
 dotenv.config();
 
@@ -14,6 +15,9 @@ const ORIGIN = process.env.ORIGIN || "http://localhost:5173";
 
 app.use(cors({ origin: ORIGIN || '*', credentials: true }));
 app.use(express.json());
+
+await dbConnect();
+console.log("✅ MongoDB connected");
 
 // ---- MongoDB Connect ----
 mongoose.connect(process.env.MONGO_URI, {
@@ -116,8 +120,11 @@ app.get("/api/health", (req, res) => res.json({ ok: true }));
 // Auth
 app.post("/api/register", async (req, res) => {
   try {
+    await dbConnect(); // ensure connection
+
     const { name, email, password } = req.body || {};
-    if (!name || !email || !password) return res.status(400).json({ error: "Missing fields" });
+    if (!name || !email || !password)
+      return res.status(400).json({ error: "Missing fields" });
 
     const existing = await User.findOne({ email });
     if (existing) return res.status(409).json({ error: "Email already registered" });
@@ -132,6 +139,7 @@ app.post("/api/register", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 app.post("/api/login", async (req, res) => {
   try {
